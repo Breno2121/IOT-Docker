@@ -39,6 +39,79 @@
         "sessionExpiry": ""
     },
     {
+        "id": "0d3875f4f5cd44e3",
+        "type": "mongodb4-client",
+        "name": "",
+        "protocol": "mongodb",
+        "hostname": "mongo",
+        "port": "",
+        "dbName": "",
+        "appName": "",
+        "authSource": "",
+        "authMechanism": "DEFAULT",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "100",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    },
+    {
+        "id": "57792113310c32ea",
+        "type": "mongodb4-client",
+        "name": "",
+        "protocol": "mongodb",
+        "hostname": "mongo",
+        "port": "27017",
+        "dbName": "sensores",
+        "appName": "",
+        "authSource": "",
+        "authMechanism": "DEFAULT",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "100",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    },
+    {
+        "id": "088d090c8f1eb232",
+        "type": "postgreSQLConfig",
+        "name": "",
+        "host": "postgres",
+        "hostFieldType": "str",
+        "port": 5432,
+        "portFieldType": "num",
+        "database": "iot",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "applicationName": "",
+        "applicationNameType": "str",
+        "max": 10,
+        "maxFieldType": "num",
+        "idle": 1000,
+        "idleFieldType": "num",
+        "connectionTimeout": 10000,
+        "connectionTimeoutFieldType": "num",
+        "user": "admin",
+        "userFieldType": "str",
+        "password": "admin",
+        "passwordFieldType": "str"
+    },
+    {
         "id": "4910262dbe5ee0bb",
         "type": "debug",
         "z": "0d2c9d51a075bcab",
@@ -51,8 +124,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 140,
-        "y": 320,
+        "x": 820,
+        "y": 240,
         "wires": []
     },
     {
@@ -60,18 +133,20 @@
         "type": "function",
         "z": "0d2c9d51a075bcab",
         "name": "function 1",
-        "func": "var obj = {};\n\nobj.id = msg.id;\nobj.createAt = new Date;\nobj.message = {};\nobj.message.temperature = msg.payload.t;\nobj.message.humidity = msg.payload.umid;\nobj.message.topic = msg.topic;\n\nmsg = obj;\n\nreturn msg;",
+        "func": "var obj = {};\n\nobj._id = msg.id;\nobj.createAt = new Date();\nobj.temperature = msg.payload.t;\nobj.humidity = msg.payload.umid;\nobj.topic = msg.topic;\n\nmsg = {};\nmsg.payload = obj;\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 140,
-        "y": 240,
+        "x": 600,
+        "y": 220,
         "wires": [
             [
-                "4910262dbe5ee0bb"
+                "4910262dbe5ee0bb",
+                "1d8a7ebceef00539",
+                "be4ec6b519056eee"
             ]
         ]
     },
@@ -86,8 +161,8 @@
         "name": "",
         "field": "id",
         "fieldType": "msg",
-        "x": 130,
-        "y": 160,
+        "x": 410,
+        "y": 180,
         "wires": [
             [
                 "c80e27cc8cfd4576"
@@ -99,7 +174,7 @@
         "type": "mqtt in",
         "z": "0d2c9d51a075bcab",
         "name": "",
-        "topic": "sensor/temperatura",
+        "topic": "#",
         "qos": "0",
         "datatype": "auto-detect",
         "broker": "a9792a16ee22bb4c",
@@ -107,11 +182,65 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 150,
-        "y": 80,
+        "x": 230,
+        "y": 140,
         "wires": [
             [
                 "800d74ea5d4c502c"
+            ]
+        ]
+    },
+    {
+        "id": "1d8a7ebceef00539",
+        "type": "mongodb4",
+        "z": "0d2c9d51a075bcab",
+        "clientNode": "57792113310c32ea",
+        "mode": "collection",
+        "collection": "sensor",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "",
+        "x": 820,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "70c5305561eb556f",
+        "type": "postgresql",
+        "z": "0d2c9d51a075bcab",
+        "name": "",
+        "query": "",
+        "postgreSQLConfig": "088d090c8f1eb232",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 830,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "be4ec6b519056eee",
+        "type": "function",
+        "z": "0d2c9d51a075bcab",
+        "name": "function 2",
+        "func": "var object = {};\nobject.query = `INSERT INTO sensores(id, createdAt, temperature, humidity, topic)VALUES ($1, $2, $3, $4, $5)`;\nobject.params = [\n    msg.payload._id,\n    msg.payload.createAt,\n    msg.payload.temperature,\n    msg.payload.humidity,\n    msg.payload.topic\n]\nmsg = {};\nmsg = object;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 320,
+        "wires": [
+            [
+                "70c5305561eb556f"
             ]
         ]
     }
