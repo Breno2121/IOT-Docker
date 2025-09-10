@@ -124,8 +124,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 820,
-        "y": 240,
+        "x": 780,
+        "y": 40,
         "wires": []
     },
     {
@@ -140,12 +140,10 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 600,
-        "y": 220,
+        "x": 480,
+        "y": 40,
         "wires": [
             [
-                "4910262dbe5ee0bb",
-                "1d8a7ebceef00539",
                 "be4ec6b519056eee"
             ]
         ]
@@ -159,13 +157,13 @@
         "namespace": "",
         "namespaceCustom": "",
         "name": "",
-        "field": "id",
+        "field": "payload._id",
         "fieldType": "msg",
-        "x": 410,
-        "y": 180,
+        "x": 470,
+        "y": 200,
         "wires": [
             [
-                "c80e27cc8cfd4576"
+                "eea68fd637cf63eb"
             ]
         ]
     },
@@ -174,7 +172,7 @@
         "type": "mqtt in",
         "z": "0d2c9d51a075bcab",
         "name": "",
-        "topic": "#",
+        "topic": "sensor/#",
         "qos": "0",
         "datatype": "auto-detect",
         "broker": "a9792a16ee22bb4c",
@@ -182,8 +180,8 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 230,
-        "y": 140,
+        "x": 300,
+        "y": 200,
         "wires": [
             [
                 "800d74ea5d4c502c"
@@ -196,14 +194,14 @@
         "z": "0d2c9d51a075bcab",
         "clientNode": "57792113310c32ea",
         "mode": "collection",
-        "collection": "sensor",
-        "operation": "insertOne",
+        "collection": "",
+        "operation": "",
         "output": "toArray",
         "maxTimeMS": "0",
         "handleDocId": false,
         "name": "",
-        "x": 820,
-        "y": 320,
+        "x": 950,
+        "y": 300,
         "wires": [
             []
         ]
@@ -218,8 +216,8 @@
         "split": false,
         "rowsPerMsg": 1,
         "outputs": 1,
-        "x": 830,
-        "y": 400,
+        "x": 950,
+        "y": 100,
         "wires": [
             []
         ]
@@ -236,11 +234,125 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 580,
-        "y": 320,
+        "x": 620,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ec950e5bdf96d238",
+        "type": "mqtt in",
+        "z": "0d2c9d51a075bcab",
+        "name": "",
+        "topic": "devices/#",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "a9792a16ee22bb4c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 300,
+        "y": 380,
         "wires": [
             [
-                "70c5305561eb556f"
+                "2592068468ece16d"
+            ]
+        ]
+    },
+    {
+        "id": "bb8bc6243a4ae3d7",
+        "type": "debug",
+        "z": "0d2c9d51a075bcab",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "5038183fabf95fe2",
+        "type": "debug",
+        "z": "0d2c9d51a075bcab",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "2592068468ece16d",
+        "type": "uuid",
+        "z": "0d2c9d51a075bcab",
+        "uuidVersion": "v4",
+        "namespaceType": "",
+        "namespace": "",
+        "namespaceCustom": "",
+        "name": "",
+        "field": "payload._id",
+        "fieldType": "msg",
+        "x": 470,
+        "y": 380,
+        "wires": [
+            [
+                "168a60eda42142a1"
+            ]
+        ]
+    },
+    {
+        "id": "168a60eda42142a1",
+        "type": "function",
+        "z": "0d2c9d51a075bcab",
+        "name": "ProcessDeviceData",
+        "func": "var message = {};\n\nmessage.payload = msg.payload;\nmessage.payload.created_at = new Date();\nmessage.operation = \"insertOne\";\nmessage.collection = \"devices\";\n\nreturn message;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 380,
+        "wires": [
+            [
+                "bb8bc6243a4ae3d7",
+                "1d8a7ebceef00539"
+            ]
+        ]
+    },
+    {
+        "id": "eea68fd637cf63eb",
+        "type": "function",
+        "z": "0d2c9d51a075bcab",
+        "name": "ProcessDataReading",
+        "func": "var message = {};\nmessage.payload = msg.payload;\nmessage.payload.topic = msg.topic;\nmessage.payload.created_at = new Date();\n\nmessage.operation =\"insertOne\";\nmessage.collection =\"reading_data\";\nreturn message;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 200,
+        "wires": [
+            [
+                "1d8a7ebceef00539",
+                "5038183fabf95fe2"
             ]
         ]
     }
